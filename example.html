@@ -1,0 +1,26 @@
+<html>
+	<body>
+		<div class="line" style="float:left;">
+		</div>
+		<div class="scatter">
+		</div>
+	</body>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.min.js"></script>
+	<script type="text/javascript" src="d3-charts.js"></script>
+	<script type="text/javascript">
+		var data = [{"x": 1, "y": 2},{"x": 2, "y": 6},{"x": 3, "y": 8}];
+		var options = {
+			element: ".line", // where to add the chart
+			data: data, // data
+
+			x: "x", // name of x column
+			xMin: 0, // minimum value of x
+			xMax: 10, // maximum value of x
+			
+			y: "y", // name of y column
+			yMin: 0, // minimum value of y
+			yMax: 10, // maximum value of y
+		}
+		var line = new Line(options);
+	</script>
+</html>
