@@ -6,6 +6,8 @@
 		</div>
 		<div class="histogram" style="float:left;">
 		</div>
+		<div class="bar-div" style="float:left;">
+		</div>
 	</body>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.10/d3.min.js"></script>
 	<script type="text/javascript" src="d3-charts.js"></script>
@@ -49,7 +51,18 @@
 			data: data, // data
 			x: "x" // name of x column
 		}
-
 		var histogram = new Histogram(options);
+
+		// bar chart
+		var data = [{"x": "A", "y": 100}, {"x": "B", "y": 50}, {"x": "C", "y": 77}];
+		var options = {
+			element: ".bar-div",
+			data: data,
+			x: "x",
+			y: "y", 
+			yMin: 0,
+			yMax: 100
+		}
+		var bar = new Bar(options);
 	</script>
 </html>

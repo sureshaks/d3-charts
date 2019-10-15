@@ -1,5 +1,11 @@
-// TODO: add x-labels
+/*
+  ____
+ |TODO|
 
+1. add x-labels
+2. modifify class name references to avoid conflict with user-defined names (e.g. add _ to the end)
+3. make sure class names are within the scope of objects and don't overlap across objects
+*/
 var Line = function(options) {
 	var _this = this;
 	// mandatory
@@ -43,6 +49,9 @@ var Line = function(options) {
 			right: 20
 		};
 	}
+	if(!("color" in options)) {
+		options.color = "steelblue";
+	}
 	this.height = options.height;
 	this.width = options.width;
 	this.element = options.element;
@@ -53,6 +62,7 @@ var Line = function(options) {
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
+	this.color = options.color;
 	this.draw();
 }
 
@@ -160,7 +170,7 @@ Line.prototype.addLine = function() {
         .classed('line',true)
         .attr('d', line)
         .attr("fill", "none")
-        .style("stroke", "black");
+        .style("stroke", _this.color);
 }
 
 /*
@@ -211,6 +221,9 @@ var Scatter = function(options) {
 			right: 20
 		};
 	}
+	if(!("color" in options)) {
+		options.color = "steelblue";
+	}
 	this.height = options.height;
 	this.width = options.width;
 	this.element = options.element;
@@ -221,6 +234,7 @@ var Scatter = function(options) {
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
+	this.color = options.color;
 	this.draw();
 };
 
@@ -317,6 +331,7 @@ Scatter.prototype.addPoints = function() {
     .enter().append("circle")
       .attr("class", "dot")
       .attr("r", 3.5)
+      .attr("fill", _this.color)
       .attr("cx", function(d) { return _this.xScale(d[_this.x]);})
       .attr("cy", function(d) { return _this.yScale(d[_this.y]); });
 };
@@ -375,6 +390,11 @@ var Histogram = function(options) {
 			right: 20
 		};
 	}
+
+	if(!("color" in options)) {
+		options.color = "steelblue";
+	}
+
 	this.height = options.height;
 	this.width = options.width;
 	this.element = options.element;
@@ -383,6 +403,7 @@ var Histogram = function(options) {
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
+	this.color = options.color;
 	this.draw();
 };
 
@@ -398,8 +419,6 @@ Histogram.prototype.draw = function() {
 
 
 Histogram.prototype.initialize = function() {
-	console.log("initialize...");
-
 	// copy scope
 	var _this = this;
 	var m = _this.margin;
@@ -476,8 +495,6 @@ Histogram.prototype.addAxes = function() {
 }
 
 Histogram.prototype.addBar = function() {
-	console.log("adding bar...");
-	console.log(this.group_by);
 	// copy scope
 	var _this = this;
 	// set the parameters for the histogram
@@ -486,13 +503,173 @@ Histogram.prototype.addBar = function() {
   					  (_this.data);
 
 
-  	var bar = _this.plot.selectAll(".bar")
+  	var bar = _this.plot.selectAll(".bar-hist")
   	          .data(_this.group_by)
   	          .enter().append("g")
-  	          .attr("class", "bar")
+  	          .attr("class", "bar-hist")
   	          .attr("transform", function(d) { return "translate(" + _this.xScale(parseFloat(d.key)) + "," + _this.yScale(d.values) + ")"; });
 
   	bar.append("rect")
     .attr("width", 10)
+    .attr("fill", _this.color)
     .attr("height", function(d) { return _this.height - (_this.margin.top + _this.margin.bottom) - _this.yScale(d.values); })
+};
+
+// Bar chart
+var Bar = function(options) {
+	// mandatory
+	this.data = options.data;
+	this.x = options.x;
+	this.y = options.y;
+
+	// copy scope
+	var _this = this;
+
+	// optional
+	if(!("height" in options)) {
+		options.height = 200;
+	}
+	if(!("width" in options)) {
+		options.width = 200;
+	}
+	if(!("element" in options)) {
+		options.element = "body";
+	}
+	if(!("title" in options)) {
+		options.title = "Bar chart";
+	}
+	if(!("font" in options)) {
+		options.font = "Segoe UI";
+	}
+	if(!("yMin" in options)) {
+		options.yMin = d3.min(this.data, function(d) { return d[_this.y]; });
+	}
+	if(!("yMax" in options)) {
+		options.yMax = d3.max(this.data, function(d) { return d[_this.y]; });
+	}
+	if(!("margin" in options)) {
+		options.margin = {
+			top: 20,
+			bottom: 20,
+			left: 20,
+			right: 20
+		};
+	}
+	if(!("color" in options)) {
+		options.color = "steelblue";
+	}
+
+	this.height = options.height;
+	this.width = options.width;
+	this.element = options.element;
+	this.yMin = options.yMin;
+	this.yMax = options.yMax;
+	this.xDomain =  d3.map(this.data, function(d){ return(d[_this.x]); }).keys();
+	this.title = options.title;
+	this.margin = options.margin;
+	this.font = options.font;
+	this.color = options.color;
+	this.draw();
+}
+
+Bar.prototype.draw = function() {
+	// copy scope
+	var _this = this;
+
+	_this.initialize();
+	_this.createScales();
+	_this.addAxes();
+	_this.addBar();
+}
+
+Bar.prototype.initialize = function() {
+	console.log("Initializing...");
+	// copy scope
+	var _this = this;
+	var m = _this.margin;
+	// set up SVG
+	d3.select(_this.element).html("");
+
+	// add title
+	d3.select(_this.element).append("center").text(_this.title).style("font-weight", "bold").style("font-family", _this.font);
+
+	// svg
+	var svg = d3.select(_this.element).append('svg');
+	svg.style("position", "relative");
+	svg.attr("width", _this.width);
+	svg.attr("height", _this.height);
+
+	// append <g>
+	_this.plot = svg.append("g")
+		.attr("transform", "translate(" + _this.margin.left + "," + _this.margin.top + ")");
+}
+
+Bar.prototype.createScales = function() {
+	// margin
+	var _this = this;
+	var m = _this.margin;
+
+	// x and y extent
+	var xExtent = _this.x
+
+	var yExtent = [_this.yMin,
+				   _this.yMax];
+
+	this.xScale = d3.scale.ordinal()
+        .rangePoints([0, _this.width-m.right-m.left])
+        .domain(_this.xDomain);
+
+    this.yScale = d3.scale.linear()
+        .range([_this.height-(m.top+m.bottom), 0])
+        .domain(yExtent);
+}
+
+Bar.prototype.addAxes = function() {
+	console.log("adding axes...");
+	var _this = this;
+	// margin
+	var m = _this.margin;
+
+	// x and y axis
+	var xAxis = d3.svg.axis()
+        .scale(_this.xScale)
+        .orient("bottom")
+        .ticks(2);
+    var yAxis = d3.svg.axis()
+        .scale(_this.yScale)
+        .orient("left")
+        .ticks(2);
+
+    // add the axis
+    this.plot.append("g")
+    	.style("font-size", "0.5em")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
+        .call(xAxis);
+    this.plot.append("g")
+    	.style("font-size", "0.5em")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    // styling
+    _this.plot.selectAll(".domain").style("fill", "none");
+    _this.plot.selectAll(".domain").style("stroke", "gray");
+    _this.plot.selectAll(".domain").style("stroke-width", "1px");
+}
+
+Bar.prototype.addBar = function() {
+	// copy scope
+	var _this = this;
+
+  	var bar = _this.plot.selectAll(".bar-chart")
+  	          .data(_this.data)
+  	          .enter().append("g")
+  	          .attr("class", "bar-chart")
+
+  	bar.append("rect")
+  	.attr("x", function(d) { return _this.xScale(d[_this.x]); })
+    .attr("width", 10)
+    .attr("fill", _this.color)
+    .attr("y", function(d) { return _this.yScale(d[_this.y]); })
+    .attr("height", function(d) { return _this.height - (_this.margin.top + _this.margin.bottom) - _this.yScale(d[_this.y]); })
 }
