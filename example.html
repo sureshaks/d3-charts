@@ -13,53 +13,53 @@
 	<script type="text/javascript" src="d3-charts.js"></script>
 	<script type="text/javascript">
 		// line chart
-		var data = [{"x": 1, "y": 2},{"x": 2, "y": 6},{"x": 3, "y": 8}];
+		var data = [{"x1": 1, "y1": 2},{"x1": 2, "y1": 6},{"x1": 3, "y1": 8}];
 		var options = {
 			element: ".line", // where to add the chart
 			data: data, // data
 
-			x: "x", // name of x column
+			x: "x1", // name of x column
 			xMin: 0, // minimum value of x
 			xMax: 10, // maximum value of x
 			
-			y: "y", // name of y column
+			y: "y1", // name of y column
 			yMin: 0, // minimum value of y
 			yMax: 10, // maximum value of y
 		}
 		var line = new Line(options);
 
 		// scatter plot
-		var data = [{"x": 1, "y": 2},{"x": 2, "y": 6},{"x": 3, "y": 8}];
+		var data = [{"x2": 1, "y2": 2},{"x2": 2, "y2": 6},{"x2": 3, "y2": 8}];
 		var options = {
 			element: ".scatter", // where to add the chart
 			data: data, // data
 
-			x: "x", // name of x column
+			x: "x2", // name of x column
 			xMin: 0, // minimum value of x
 			xMax: 10, // maximum value of x
 			
-			y: "y", // name of y column
+			y: "y2", // name of y column
 			yMin: 0, // minimum value of y
 			yMax: 10, // maximum value of y
 		}
 		var scatter = new Scatter(options);
 
 		// histogram
-		var data = [{"x": 1, "y": 2},{"x": 1, "y": 6},{"x": 2, "y": 8}];
+		var data = [{"x3": 1, "y3": 2},{"x3": 1, "y3": 6},{"x3": 2, "y3": 8}];
 		var options = {
 			element: ".histogram", // where to add the chart
 			data: data, // data
-			x: "x" // name of x column
+			x: "x3" // name of x column
 		}
 		var histogram = new Histogram(options);
 
 		// bar chart
-		var data = [{"x": "A", "y": 100}, {"x": "B", "y": 50}, {"x": "C", "y": 77}];
+		var data = [{"x4": "A", "y4": 100}, {"x4": "B", "y4": 50}, {"x4": "C", "y4": 77}];
 		var options = {
 			element: ".bar-div",
 			data: data,
-			x: "x",
-			y: "y", 
+			x: "x4",
+			y: "y4", 
 			yMin: 0,
 			yMax: 100
 		}

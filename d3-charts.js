@@ -1,10 +1,7 @@
 /*
   ____
  |TODO|
-
-1. add x-labels
-2. modifify class name references to avoid conflict with user-defined names (e.g. add _ to the end)
-3. make sure class names are within the scope of objects and don't overlap across objects
+1. go through code and make the structures more uniform (e.g. this vs _this)
 */
 var Line = function(options) {
 	var _this = this;
@@ -35,18 +32,24 @@ var Line = function(options) {
 	if(!("xMax" in options)) {
 		options.xMax = d3.max(this.data, function(d) { return d[_this.x]; });
 	}
+	if(!("xLabel" in options)) {
+		options.xLabel = options.x;
+	}
 	if(!("yMin" in options)) {
 		options.yMin = d3.min(this.data, function(d) { return d[_this.y]; });
 	}
 	if(!("yMax" in options)) {
 		options.yMax = d3.max(this.data, function(d) { return d[_this.y]; });
 	}
+	if(!("yLabel" in options)) {
+		options.yLabel = options.y;
+	}
 	if(!("margin" in options)) {
 		options.margin = {
-			top: 20,
-			bottom: 20,
-			left: 20,
-			right: 20
+			top: 30,
+			bottom: 30,
+			left: 50,
+			right: 30
 		};
 	}
 	if(!("color" in options)) {
@@ -57,8 +60,10 @@ var Line = function(options) {
 	this.element = options.element;
 	this.xMin = options.xMin;
 	this.xMax = options.xMax;
+	this.xLabel = options.xLabel;
 	this.yMin = options.yMin;
 	this.yMax = options.yMax;
+	this.yLabel = options.yLabel;
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
@@ -140,10 +145,30 @@ Line.prototype.addAxes = function() {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
+
+    // x-label
+    this.plot.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "middle")
+    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
+    .attr("y", this.height - this.margin.bottom)
+    .attr("font-size", "0.75em")
+    .text(_this.xLabel);
+
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
         .call(yAxis);
+	
+	// y-label
+    this.plot.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -1 * this.margin.left/2)
+    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("font-size", "0.75em")
+    .attr("transform", "rotate(-90)")
+    .text(_this.yLabel);
 
     // styling
     _this.plot.selectAll(".domain").style("fill", "none");
@@ -207,18 +232,24 @@ var Scatter = function(options) {
 	if(!("xMax" in options)) {
 		options.xMax = d3.max(this.data, function(d) { return d[_this.x]; });
 	}
+	if(!("xLabel" in options)) {
+		options.xLabel = options.x;
+	}
 	if(!("yMin" in options)) {
 		options.yMin = d3.min(this.data, function(d) { return d[_this.y]; });
 	}
 	if(!("yMax" in options)) {
 		options.yMax = d3.max(this.data, function(d) { return d[_this.y]; });
 	}
+	if(!("yLabel" in options)) {
+		options.yLabel = options.y;
+	}
 	if(!("margin" in options)) {
 		options.margin = {
-			top: 20,
-			bottom: 20,
-			left: 20,
-			right: 20
+			top: 30,
+			bottom: 30,
+			left: 50,
+			right: 30
 		};
 	}
 	if(!("color" in options)) {
@@ -229,8 +260,10 @@ var Scatter = function(options) {
 	this.element = options.element;
 	this.xMin = options.xMin;
 	this.xMax = options.xMax;
+	this.xLabel = options.xLabel;
 	this.yMin = options.yMin;
 	this.yMax = options.yMax;
+	this.yLabel = options.yLabel;
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
@@ -312,10 +345,30 @@ Scatter.prototype.addAxes = function() {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
+
+    // x-label
+    this.plot.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "middle")
+    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
+    .attr("y", this.height - this.margin.bottom)
+    .attr("font-size", "0.75em")
+    .text(_this.xLabel);
+
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
         .call(yAxis);
+
+    // y-label
+    this.plot.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -1 * this.margin.left/2)
+    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("font-size", "0.75em")
+    .attr("transform", "rotate(-90)")
+    .text(_this.yLabel);
 
     // styling
     _this.plot.selectAll(".domain").style("fill", "none");
@@ -326,10 +379,10 @@ Scatter.prototype.addAxes = function() {
 Scatter.prototype.addPoints = function() {
 	// store scope in temporary variable
 	var _this = this;
-	_this.plot.selectAll(".dot")
+	_this.plot.selectAll(".dot_")
       .data(this.data)
     .enter().append("circle")
-      .attr("class", "dot")
+      .attr("class", "dot_")
       .attr("r", 3.5)
       .attr("fill", _this.color)
       .attr("cx", function(d) { return _this.xScale(d[_this.x]);})
@@ -365,6 +418,9 @@ var Histogram = function(options) {
 	if(!("xMax" in options)) {
 		options.xMax = d3.max(this.data, function(d) { return d[_this.x]; });
 	}
+	if(!("xLabel" in options)) {
+		options.xLabel = options.x;
+	}
 
 	// group by
 	this.group_by =  d3.nest()
@@ -379,15 +435,16 @@ var Histogram = function(options) {
 		v.relative_values = v.values/total;
 	});
 
-	this.yMin = 0;
-	this.yMax = total;
+	if(!("yLabel" in options)) {
+		options.yLabel = "Count";
+	}
 
 	if(!("margin" in options)) {
 		options.margin = {
-			top: 20,
-			bottom: 20,
-			left: 20,
-			right: 20
+			top: 30,
+			bottom: 30,
+			left: 50,
+			right: 30
 		};
 	}
 
@@ -400,6 +457,10 @@ var Histogram = function(options) {
 	this.element = options.element;
 	this.xMin = options.xMin;
 	this.xMax = options.xMax;
+	this.xLabel = options.xLabel;
+	this.yMin = 0;
+	this.yMax = total;
+	this.yLabel = options.yLabel;
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
@@ -483,10 +544,30 @@ Histogram.prototype.addAxes = function() {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
+
+    // x-label
+    this.plot.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "middle")
+    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
+    .attr("y", this.height - this.margin.bottom)
+    .attr("font-size", "0.75em")
+    .text(_this.xLabel);
+
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
         .call(yAxis);
+
+	// y-label
+    this.plot.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -1 * this.margin.left/2)
+    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("font-size", "0.75em")
+    .attr("transform", "rotate(-90)")
+    .text(_this.yLabel);
 
     // styling
     _this.plot.selectAll(".domain").style("fill", "none");
@@ -503,10 +584,10 @@ Histogram.prototype.addBar = function() {
   					  (_this.data);
 
 
-  	var bar = _this.plot.selectAll(".bar-hist")
+  	var bar = _this.plot.selectAll(".bar-hist_")
   	          .data(_this.group_by)
   	          .enter().append("g")
-  	          .attr("class", "bar-hist")
+  	          .attr("class", "bar-hist_")
   	          .attr("transform", function(d) { return "translate(" + _this.xScale(parseFloat(d.key)) + "," + _this.yScale(d.values) + ")"; });
 
   	bar.append("rect")
@@ -541,18 +622,28 @@ var Bar = function(options) {
 	if(!("font" in options)) {
 		options.font = "Segoe UI";
 	}
+
+	if(!("xLabel" in options)) {
+		options.xLabel = _this.x;
+	}
+
 	if(!("yMin" in options)) {
 		options.yMin = d3.min(this.data, function(d) { return d[_this.y]; });
 	}
 	if(!("yMax" in options)) {
 		options.yMax = d3.max(this.data, function(d) { return d[_this.y]; });
 	}
+
+	if(!("yLabel" in options)) {
+		options.yLabel = _this.y;
+	}
+
 	if(!("margin" in options)) {
 		options.margin = {
-			top: 20,
-			bottom: 20,
-			left: 20,
-			right: 20
+			top: 30,
+			bottom: 30,
+			left: 50,
+			right: 30
 		};
 	}
 	if(!("color" in options)) {
@@ -564,7 +655,9 @@ var Bar = function(options) {
 	this.element = options.element;
 	this.yMin = options.yMin;
 	this.yMax = options.yMax;
+	this.yLabel = options.yLabel;
 	this.xDomain =  d3.map(this.data, function(d){ return(d[_this.x]); }).keys();
+	this.xLabel = options.xLabel;
 	this.title = options.title;
 	this.margin = options.margin;
 	this.font = options.font;
@@ -646,10 +739,30 @@ Bar.prototype.addAxes = function() {
         .attr("class", "x axis")
         .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
+
+    // x-label
+    this.plot.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "middle")
+    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
+    .attr("y", this.height - this.margin.bottom)
+    .attr("font-size", "0.75em")
+    .text(_this.xLabel);
+
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
         .call(yAxis);
+
+	// y-label
+    this.plot.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -1 * this.margin.left/2)
+    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("font-size", "0.75em")
+    .attr("transform", "rotate(-90)")
+    .text(_this.yLabel);
 
     // styling
     _this.plot.selectAll(".domain").style("fill", "none");
@@ -661,10 +774,10 @@ Bar.prototype.addBar = function() {
 	// copy scope
 	var _this = this;
 
-  	var bar = _this.plot.selectAll(".bar-chart")
+  	var bar = _this.plot.selectAll(".bar-chart_")
   	          .data(_this.data)
   	          .enter().append("g")
-  	          .attr("class", "bar-chart")
+  	          .attr("class", "bar-chart_")
 
   	bar.append("rect")
   	.attr("x", function(d) { return _this.xScale(d[_this.x]); })
