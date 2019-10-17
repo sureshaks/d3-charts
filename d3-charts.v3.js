@@ -1,8 +1,15 @@
-/*
-  ____
- |TODO|
-1. go through code and make the structures more uniform (e.g. this vs _this)
-*/
+/**
+d3-charts.v3.js
+Author: Akshay Suresh
+**/
+
+// global options
+var Global = {
+	font: "Segoe UI",
+	color: "steelblue",
+	axisColor: "gray"
+}
+
 var Line = function(options) {
 	// copy scope
 	var _this = this;
@@ -26,7 +33,7 @@ var Line = function(options) {
 		options.title = "Line chart";
 	}
 	if(!("font" in options)) {
-		options.font = "Segoe UI";
+		options.font = Global.font;
 	}
 	if(!("xMin" in options)) {
 		options.xMin = d3.min(this.data, function(d) { return d[_this.x]; });
@@ -46,6 +53,9 @@ var Line = function(options) {
 	if(!("yLabel" in options)) {
 		options.yLabel = options.y;
 	}
+	if(!("axisColor" in options)) {
+		options.axisColor = Global.axisColor;
+	}
 	if(!("margin" in options)) {
 		options.margin = {
 			top: 30,
@@ -55,7 +65,7 @@ var Line = function(options) {
 		};
 	}
 	if(!("color" in options)) {
-		options.color = "steelblue";
+		options.color = Global.color;
 	}
 	this.height = options.height;
 	this.width = options.width;
@@ -70,88 +80,77 @@ var Line = function(options) {
 	this.margin = options.margin;
 	this.font = options.font;
 	this.color = options.color;
+	this.axisColor = options.axisColor;
 	this.draw();
 }
 
 Line.prototype.draw = function() {
-	// copy scope
-	var _this = this;
-
-	_this.initialize();
-	_this.createScales();
-	_this.addAxes();
-	_this.addLine();
+	this.initialize();
+	this.createScales();
+	this.addAxes();
+	this.addLine();
 };
 
 Line.prototype.initialize = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// set up SVG
-	d3.select(_this.element).html("");
+	d3.select(this.element).html("");
 
 	// add title
-	d3.select(_this.element).append("center").text(_this.title).style("font-weight", "bold").style("font-family", _this.font);
+	d3.select(this.element).append("center").text(this.title).style("font-weight", "bold").style("font-family", this.font);
 
 	// svg
-	var svg = d3.select(_this.element).append('svg');
+	var svg = d3.select(this.element).append('svg');
 	svg.style("position", "relative");
-	svg.attr("width", _this.width);
-	svg.attr("height", _this.height);
+	svg.attr("width", this.width);
+	svg.attr("height", this.height);
 
 	// append <g>
-	_this.plot = svg.append("g")
+	this.plot = svg.append("g")
 		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 }
 
 
 Line.prototype.createScales = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y extent
-	var xExtent = [_this.xMin,
-				   _this.xMax];
-	var yExtent = [_this.yMin,
-				   _this.yMax];
+	var xExtent = [this.xMin,
+				   this.xMax];
+	var yExtent = [this.yMin,
+				   this.yMax];
 
 	// x and y scale
 	this.xScale = d3.scale.linear()
-        .range([0, _this.width-m.right-m.left])
+        .range([0, this.width-m.right-m.left])
         .domain(xExtent);
     this.yScale = d3.scale.linear()
-        .range([_this.height-(m.top+m.bottom), 0])
+        .range([this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 }
 
 Line.prototype.addAxes = function() {
-	// copy scope
-	var _this = this;
-
 	// margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y axis
 	var xAxis = d3.svg.axis()
-        .scale(_this.xScale)
+        .scale(this.xScale)
         .orient("bottom")
         .ticks(2);
     var yAxis = d3.svg.axis()
-        .scale(_this.yScale)
+        .scale(this.yScale)
         .orient("left")
         .ticks(2);
 
-    // add the axis
+    // x-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
+        .attr("transform", "translate(0," + (this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
 
     // x-label
@@ -161,8 +160,9 @@ Line.prototype.addAxes = function() {
     .attr("x", (this.width - (m.left + m.right))/2)
     .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
-    .text(_this.xLabel);
+    .text(this.xLabel);
 
+    // y-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
@@ -176,12 +176,12 @@ Line.prototype.addAxes = function() {
     .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
-    .text(_this.yLabel);
+    .text(this.yLabel);
 
     // styling
-    _this.plot.selectAll(".domain").style("fill", "none");
-    _this.plot.selectAll(".domain").style("stroke", "gray");
-    _this.plot.selectAll(".domain").style("stroke-width", "1px");
+    this.plot.selectAll(".domain").style("fill", "none");
+    this.plot.selectAll(".domain").style("stroke", this.axisColor);
+    this.plot.selectAll(".domain").style("stroke-width", "1px");
 }
 
 Line.prototype.addLine = function() {
@@ -196,12 +196,12 @@ Line.prototype.addLine = function() {
             return _this.yScale(d[_this.y]);
     	});
 
-   	_this.plot.append('path')
-        .datum(_this.data)
+   	this.plot.append('path')
+        .datum(this.data)
         .classed('line',true)
         .attr('d', line)
         .attr("fill", "none")
-        .style("stroke", _this.color);
+        .style("stroke", this.color);
 }
 
 /*
@@ -232,7 +232,7 @@ var Scatter = function(options) {
 		options.title = "Scatter chart";
 	}
 	if(!("font" in options)) {
-		options.font = "Segoe UI";
+		options.font = Global.font;
 	}
 	if(!("xMin" in options)) {
 		options.xMin = d3.min(this.data, function(d) { return d[_this.x]; });
@@ -261,7 +261,10 @@ var Scatter = function(options) {
 		};
 	}
 	if(!("color" in options)) {
-		options.color = "steelblue";
+		options.color = Global.color;
+	}
+	if(!("axisColor" in options)) {
+		options.axisColor = Global.axisColor;
 	}
 	this.height = options.height;
 	this.width = options.width;
@@ -276,80 +279,69 @@ var Scatter = function(options) {
 	this.margin = options.margin;
 	this.font = options.font;
 	this.color = options.color;
+	this.axisColor = options.axisColor;
 	this.draw();
 };
 
 Scatter.prototype.draw = function() {
-	// copy scope
-	var _this = this;
-
-	_this.initialize();
-	_this.createScales();
-	_this.addAxes();
-	_this.addPoints();
+	this.initialize();
+	this.createScales();
+	this.addAxes();
+	this.addPoints();
 };
 
 Scatter.prototype.initialize = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// set up SVG
-	d3.select(_this.element).html("");
+	d3.select(this.element).html("");
 
 	// add title
-	d3.select(_this.element).append("center").text(_this.title).style("font-weight", "bold").style("font-family", _this.font);
+	d3.select(this.element).append("center").text(this.title).style("font-weight", "bold").style("font-family", this.font);
 
 	// svg
-	var svg = d3.select(_this.element).append('svg');
+	var svg = d3.select(this.element).append('svg');
 	svg.style("position", "relative");
-	svg.attr("width", _this.width);
-	svg.attr("height", _this.height);
+	svg.attr("width", this.width);
+	svg.attr("height", this.height);
 
 	// append <g>
-	_this.plot = svg.append("g")
+	this.plot = svg.append("g")
 		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 };
 
 
 Scatter.prototype.createScales = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y extent
-	var xExtent = [_this.xMin,
-				   _this.xMax];
-	var yExtent = [_this.yMin,
-				   _this.yMax];
+	var xExtent = [this.xMin,
+				   this.xMax];
+	var yExtent = [this.yMin,
+				   this.yMax];
 
 	// x and y scale
 	this.xScale = d3.scale.linear()
-        .range([0, _this.width-m.right-m.left])
+        .range([0, this.width-m.right-m.left])
         .domain(xExtent);
     this.yScale = d3.scale.linear()
-        .range([_this.height-(m.top+m.bottom), 0])
+        .range([this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 };
 
 Scatter.prototype.addAxes = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y axis
 	var xAxis = d3.svg.axis()
-        .scale(_this.xScale)
+        .scale(this.xScale)
         .orient("bottom")
         .ticks(2);
     var yAxis = d3.svg.axis()
-        .scale(_this.yScale)
+        .scale(this.yScale)
         .orient("left")
         .ticks(2);
 
@@ -357,7 +349,7 @@ Scatter.prototype.addAxes = function() {
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
+        .attr("transform", "translate(0," + (this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
 
     // x-label
@@ -367,7 +359,7 @@ Scatter.prototype.addAxes = function() {
     .attr("x", (this.width - (m.left + m.right))/2)
     .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
-    .text(_this.xLabel);
+    .text(this.xLabel);
 
     // y-axis
     this.plot.append("g")
@@ -383,24 +375,24 @@ Scatter.prototype.addAxes = function() {
     .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
-    .text(_this.yLabel);
+    .text(this.yLabel);
 
     // styling
-    _this.plot.selectAll(".domain").style("fill", "none");
-    _this.plot.selectAll(".domain").style("stroke", "gray");
-    _this.plot.selectAll(".domain").style("stroke-width", "1px");
+    this.plot.selectAll(".domain").style("fill", "none");
+    this.plot.selectAll(".domain").style("stroke", this.axisColor);
+    this.plot.selectAll(".domain").style("stroke-width", "1px");
 };
 
 Scatter.prototype.addPoints = function() {
 	// copy scope
 	var _this = this;
 
-	_this.plot.selectAll(".dot_")
+	this.plot.selectAll(".dot_")
       .data(this.data)
     .enter().append("circle")
       .attr("class", "dot_")
       .attr("r", 3.5)
-      .attr("fill", _this.color)
+      .attr("fill", this.color)
       .attr("cx", function(d) { return _this.xScale(d[_this.x]);})
       .attr("cy", function(d) { return _this.yScale(d[_this.y]); });
 };
@@ -427,7 +419,7 @@ var Histogram = function(options) {
 		options.title = "Histogram";
 	}
 	if(!("font" in options)) {
-		options.font = "Segoe UI";
+		options.font = Global.font;
 	}
 	if(!("xMin" in options)) {
 		options.xMin = d3.min(this.data, function(d) { return d[_this.x]; });
@@ -443,7 +435,7 @@ var Histogram = function(options) {
 	this.group_by =  d3.nest()
 					   .key(function(v) { return v[_this.x]; })
 					   .rollup(function(v) { return v.length; })
-					   .entries(_this.data);
+					   .entries(this.data);
 
 	var total = d3.sum(this.group_by, function(v) {
 						return v.values;
@@ -466,7 +458,10 @@ var Histogram = function(options) {
 	}
 
 	if(!("color" in options)) {
-		options.color = "steelblue";
+		options.color = Global.color;
+	}
+	if(!("axisColor" in options)) {
+		options.axisColor = Global.axisColor;
 	}
 
 	this.height = options.height;
@@ -482,81 +477,70 @@ var Histogram = function(options) {
 	this.margin = options.margin;
 	this.font = options.font;
 	this.color = options.color;
+	this.axisColor = options.axisColor;
 	this.draw();
 };
 
 Histogram.prototype.draw = function() {
-	// copy scope
-	var _this = this;
-
-	_this.initialize();
-	_this.createScales();
-	_this.addAxes();
-	_this.addBar();
+	this.initialize();
+	this.createScales();
+	this.addAxes();
+	this.addBar();
 };
 
 
 Histogram.prototype.initialize = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// set up SVG
-	d3.select(_this.element).html("");
+	d3.select(this.element).html("");
 
 	// add title
-	d3.select(_this.element).append("center").text(_this.title).style("font-weight", "bold").style("font-family", _this.font);
+	d3.select(this.element).append("center").text(this.title).style("font-weight", "bold").style("font-family", this.font);
 
 	// svg
-	var svg = d3.select(_this.element).append('svg');
+	var svg = d3.select(this.element).append('svg');
 	svg.style("position", "relative");
-	svg.attr("width", _this.width);
-	svg.attr("height", _this.height);
+	svg.attr("width", this.width);
+	svg.attr("height", this.height);
 
 	// append <g>
-	_this.plot = svg.append("g")
+	this.plot = svg.append("g")
 		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 };
 
 Histogram.prototype.createScales = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y extent
-	var xExtent = [_this.xMin,
-				   _this.xMax];
+	var xExtent = [this.xMin,
+				   this.xMax];
 
-	var yExtent = [_this.yMin,
-				   _this.yMax];
+	var yExtent = [this.yMin,
+				   this.yMax];
 
+	// x and y scale
 	this.xScale = d3.scale.linear()
-        .range([0, _this.width-m.right-m.left])
+        .range([0, this.width-m.right-m.left])
         .domain(xExtent);
-
     this.yScale = d3.scale.linear()
-        .range([_this.height-(m.top+m.bottom), 0])
+        .range([this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 }
 
 Histogram.prototype.addAxes = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y axis
 	var xAxis = d3.svg.axis()
-        .scale(_this.xScale)
+        .scale(this.xScale)
         .orient("bottom")
         .ticks(2);
     var yAxis = d3.svg.axis()
-        .scale(_this.yScale)
+        .scale(this.yScale)
         .orient("left")
         .ticks(2);
 
@@ -564,7 +548,7 @@ Histogram.prototype.addAxes = function() {
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
+        .attr("transform", "translate(0," + (this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
 
     // x-label
@@ -574,7 +558,7 @@ Histogram.prototype.addAxes = function() {
     .attr("x", (this.width - (m.left + m.right))/2)
     .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
-    .text(_this.xLabel);
+    .text(this.xLabel);
 
     // y-axis
     this.plot.append("g")
@@ -590,12 +574,12 @@ Histogram.prototype.addAxes = function() {
     .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
-    .text(_this.yLabel);
+    .text(this.yLabel);
 
     // styling
-    _this.plot.selectAll(".domain").style("fill", "none");
-    _this.plot.selectAll(".domain").style("stroke", "gray");
-    _this.plot.selectAll(".domain").style("stroke-width", "1px");
+    this.plot.selectAll(".domain").style("fill", "none");
+    this.plot.selectAll(".domain").style("stroke", this.axisColor);
+    this.plot.selectAll(".domain").style("stroke-width", "1px");
 }
 
 Histogram.prototype.addBar = function() {
@@ -603,20 +587,20 @@ Histogram.prototype.addBar = function() {
 	var _this = this;
 
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
   	var histogram = d3.layout.histogram()
-  					  .bins(_this.xScale.ticks(10))
-  					  (_this.data);
-  	var bar = _this.plot.selectAll(".bar-hist_")
-  	          .data(_this.group_by)
+  					  .bins(this.xScale.ticks(10))
+  					  (this.data);
+  	var bar = this.plot.selectAll(".bar-hist_")
+  	          .data(this.group_by)
   	          .enter().append("g")
   	          .attr("class", "bar-hist_")
   	          .attr("transform", function(d) { return "translate(" + _this.xScale(parseFloat(d.key)) + "," + _this.yScale(d.values) + ")"; });
 
   	bar.append("rect")
     .attr("width", 10)
-    .attr("fill", _this.color)
+    .attr("fill", this.color)
     .attr("height", function(d) { return _this.height - (m.top + m.bottom) - _this.yScale(d.values); })
 };
 
@@ -644,11 +628,11 @@ var Bar = function(options) {
 		options.title = "Bar chart";
 	}
 	if(!("font" in options)) {
-		options.font = "Segoe UI";
+		options.font = Global.font;
 	}
 
 	if(!("xLabel" in options)) {
-		options.xLabel = _this.x;
+		options.xLabel = this.x;
 	}
 
 	if(!("yMin" in options)) {
@@ -659,7 +643,7 @@ var Bar = function(options) {
 	}
 
 	if(!("yLabel" in options)) {
-		options.yLabel = _this.y;
+		options.yLabel = this.y;
 	}
 
 	if(!("margin" in options)) {
@@ -671,7 +655,10 @@ var Bar = function(options) {
 		};
 	}
 	if(!("color" in options)) {
-		options.color = "steelblue";
+		options.color = Global.color;
+	}
+	if(!("axisColor" in options)) {
+		options.axisColor = Global.axisColor;
 	}
 
 	this.height = options.height;
@@ -686,78 +673,67 @@ var Bar = function(options) {
 	this.margin = options.margin;
 	this.font = options.font;
 	this.color = options.color;
+	this.axisColor = options.axisColor;
 	this.draw();
 }
 
 Bar.prototype.draw = function() {
-	// copy scope
-	var _this = this;
-
-	_this.initialize();
-	_this.createScales();
-	_this.addAxes();
-	_this.addBar();
+	this.initialize();
+	this.createScales();
+	this.addAxes();
+	this.addBar();
 }
 
 Bar.prototype.initialize = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// set up SVG
-	d3.select(_this.element).html("");
+	d3.select(this.element).html("");
 
 	// add title
-	d3.select(_this.element).append("center").text(_this.title).style("font-weight", "bold").style("font-family", _this.font);
+	d3.select(this.element).append("center").text(this.title).style("font-weight", "bold").style("font-family", this.font);
 
 	// svg
-	var svg = d3.select(_this.element).append('svg');
+	var svg = d3.select(this.element).append('svg');
 	svg.style("position", "relative");
-	svg.attr("width", _this.width);
-	svg.attr("height", _this.height);
+	svg.attr("width", this.width);
+	svg.attr("height", this.height);
 
 	// append <g>
-	_this.plot = svg.append("g")
+	this.plot = svg.append("g")
 		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 }
 
 Bar.prototype.createScales = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y extent
-	var xExtent = _this.x
-	var yExtent = [_this.yMin,
-				   _this.yMax];
+	var xExtent = this.x
+	var yExtent = [this.yMin,
+				   this.yMax];
 
 	// x and y scale
 	this.xScale = d3.scale.ordinal()
-        .rangePoints([0, _this.width-m.right-m.left])
-        .domain(_this.xDomain);
+        .rangePoints([0, this.width-m.right-m.left])
+        .domain(this.xDomain);
     this.yScale = d3.scale.linear()
-        .range([_this.height-(m.top+m.bottom), 0])
+        .range([this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 }
 
 Bar.prototype.addAxes = function() {
-	// copy scope
-	var _this = this;
-
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
 	// x and y axis
 	var xAxis = d3.svg.axis()
-        .scale(_this.xScale)
+        .scale(this.xScale)
         .orient("bottom")
         .ticks(2);
     var yAxis = d3.svg.axis()
-        .scale(_this.yScale)
+        .scale(this.yScale)
         .orient("left")
         .ticks(2);
 
@@ -765,7 +741,7 @@ Bar.prototype.addAxes = function() {
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (_this.height-(m.top+m.bottom)) + ")")
+        .attr("transform", "translate(0," + (this.height-(m.top+m.bottom)) + ")")
         .call(xAxis);
 
     // x-label
@@ -775,7 +751,7 @@ Bar.prototype.addAxes = function() {
     .attr("x", (this.width - (m.left + m.right))/2)
     .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
-    .text(_this.xLabel);
+    .text(this.xLabel);
 
     // y-axis
     this.plot.append("g")
@@ -791,12 +767,12 @@ Bar.prototype.addAxes = function() {
     .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
-    .text(_this.yLabel);
+    .text(this.yLabel);
 
     // styling
-    _this.plot.selectAll(".domain").style("fill", "none");
-    _this.plot.selectAll(".domain").style("stroke", "gray");
-    _this.plot.selectAll(".domain").style("stroke-width", "1px");
+    this.plot.selectAll(".domain").style("fill", "none");
+    this.plot.selectAll(".domain").style("stroke", this.axisColor);
+    this.plot.selectAll(".domain").style("stroke-width", "1px");
 }
 
 Bar.prototype.addBar = function() {
@@ -804,17 +780,17 @@ Bar.prototype.addBar = function() {
 	var _this = this;
 
 	// shorthand for margin
-	var m = _this.margin;
+	var m = this.margin;
 
-  	var bar = _this.plot.selectAll(".bar-chart_")
-  	          .data(_this.data)
+  	var bar = this.plot.selectAll(".bar-chart_")
+  	          .data(this.data)
   	          .enter().append("g")
   	          .attr("class", "bar-chart_")
 
   	bar.append("rect")
   	.attr("x", function(d) { return _this.xScale(d[_this.x]); })
     .attr("width", 10)
-    .attr("fill", _this.color)
+    .attr("fill", this.color)
     .attr("y", function(d) { return _this.yScale(d[_this.y]); })
     .attr("height", function(d) { return _this.height - (m.top + m.bottom) - _this.yScale(d[_this.y]); })
 }
