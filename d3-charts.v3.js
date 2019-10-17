@@ -4,7 +4,9 @@
 1. go through code and make the structures more uniform (e.g. this vs _this)
 */
 var Line = function(options) {
+	// copy scope
 	var _this = this;
+
 	// mandatory
 	this.data = options.data;
 	this.x = options.x;
@@ -84,7 +86,10 @@ Line.prototype.draw = function() {
 Line.prototype.initialize = function() {
 	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
+
 	// set up SVG
 	d3.select(_this.element).html("");
 
@@ -99,33 +104,36 @@ Line.prototype.initialize = function() {
 
 	// append <g>
 	_this.plot = svg.append("g")
-		.attr("transform", "translate(" + _this.margin.left + "," + _this.margin.top + ")");
+		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 }
 
 
 Line.prototype.createScales = function() {
-	// margin
+	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y extent
 	var xExtent = [_this.xMin,
 				   _this.xMax];
-
 	var yExtent = [_this.yMin,
 				   _this.yMax];
 
+	// x and y scale
 	this.xScale = d3.scale.linear()
         .range([0, _this.width-m.right-m.left])
         .domain(xExtent);
-
     this.yScale = d3.scale.linear()
         .range([_this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 }
 
 Line.prototype.addAxes = function() {
+	// copy scope
 	var _this = this;
+
 	// margin
 	var m = _this.margin;
 
@@ -150,8 +158,8 @@ Line.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "x label")
     .attr("text-anchor", "middle")
-    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
-    .attr("y", this.height - this.margin.bottom)
+    .attr("x", (this.width - (m.left + m.right))/2)
+    .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
     .text(_this.xLabel);
 
@@ -164,8 +172,8 @@ Line.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", -1 * this.margin.left/2)
-    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("y", -1 * m.left/2)
+    .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
     .text(_this.yLabel);
@@ -177,12 +185,11 @@ Line.prototype.addAxes = function() {
 }
 
 Line.prototype.addLine = function() {
-	// store scope in temporary variable
+	// copy scope
 	var _this = this;
 
 	var line = d3.svg.line()
         .x(function(d) {
-            // ... so we can access it here
             return _this.xScale(d[_this.x]);
         })
         .y(function(d) {
@@ -190,7 +197,6 @@ Line.prototype.addLine = function() {
     	});
 
    	_this.plot.append('path')
-        // use data stored in `this`
         .datum(_this.data)
         .classed('line',true)
         .attr('d', line)
@@ -204,7 +210,9 @@ Line.prototype.addLine = function() {
 
 
 var Scatter = function(options) {
+	// copy scope
 	var _this = this;
+
 	// mandatory
 	this.data = options.data;
 	this.x = options.x;
@@ -284,7 +292,10 @@ Scatter.prototype.draw = function() {
 Scatter.prototype.initialize = function() {
 	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
+
 	// set up SVG
 	d3.select(_this.element).html("");
 
@@ -299,34 +310,37 @@ Scatter.prototype.initialize = function() {
 
 	// append <g>
 	_this.plot = svg.append("g")
-		.attr("transform", "translate(" + _this.margin.left + "," + _this.margin.top + ")");
+		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 };
 
 
 Scatter.prototype.createScales = function() {
-	// margin
+	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y extent
 	var xExtent = [_this.xMin,
 				   _this.xMax];
-
 	var yExtent = [_this.yMin,
 				   _this.yMax];
 
+	// x and y scale
 	this.xScale = d3.scale.linear()
         .range([0, _this.width-m.right-m.left])
         .domain(xExtent);
-
     this.yScale = d3.scale.linear()
         .range([_this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 };
 
 Scatter.prototype.addAxes = function() {
+	// copy scope
 	var _this = this;
-	// margin
+
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y axis
@@ -339,7 +353,7 @@ Scatter.prototype.addAxes = function() {
         .orient("left")
         .ticks(2);
 
-    // add the axis
+    // x-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
@@ -350,11 +364,12 @@ Scatter.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "x label")
     .attr("text-anchor", "middle")
-    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
-    .attr("y", this.height - this.margin.bottom)
+    .attr("x", (this.width - (m.left + m.right))/2)
+    .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
     .text(_this.xLabel);
 
+    // y-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
@@ -364,8 +379,8 @@ Scatter.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", -1 * this.margin.left/2)
-    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("y", -1 * m.left/2)
+    .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
     .text(_this.yLabel);
@@ -377,8 +392,9 @@ Scatter.prototype.addAxes = function() {
 };
 
 Scatter.prototype.addPoints = function() {
-	// store scope in temporary variable
+	// copy scope
 	var _this = this;
+
 	_this.plot.selectAll(".dot_")
       .data(this.data)
     .enter().append("circle")
@@ -390,11 +406,12 @@ Scatter.prototype.addPoints = function() {
 };
 
 var Histogram = function(options) {
+	// copy scope
+	var _this = this;
+
 	// mandatory
 	this.data = options.data;
 	this.x = options.x;
-
-	var _this = this;
 
 	// optional
 	if(!("height" in options)) {
@@ -482,7 +499,10 @@ Histogram.prototype.draw = function() {
 Histogram.prototype.initialize = function() {
 	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
+
 	// set up SVG
 	d3.select(_this.element).html("");
 
@@ -497,14 +517,14 @@ Histogram.prototype.initialize = function() {
 
 	// append <g>
 	_this.plot = svg.append("g")
-		.attr("transform", "translate(" + _this.margin.left + "," + _this.margin.top + ")");
+		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 };
 
 Histogram.prototype.createScales = function() {
 	// copy scope
 	var _this = this;
 
-	// margin
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y extent
@@ -524,8 +544,10 @@ Histogram.prototype.createScales = function() {
 }
 
 Histogram.prototype.addAxes = function() {
+	// copy scope
 	var _this = this;
-	// margin
+
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y axis
@@ -538,7 +560,7 @@ Histogram.prototype.addAxes = function() {
         .orient("left")
         .ticks(2);
 
-    // add the axis
+    // x-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
@@ -549,11 +571,12 @@ Histogram.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "x label")
     .attr("text-anchor", "middle")
-    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
-    .attr("y", this.height - this.margin.bottom)
+    .attr("x", (this.width - (m.left + m.right))/2)
+    .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
     .text(_this.xLabel);
 
+    // y-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
@@ -563,8 +586,8 @@ Histogram.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", -1 * this.margin.left/2)
-    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("y", -1 * m.left/2)
+    .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
     .text(_this.yLabel);
@@ -578,12 +601,13 @@ Histogram.prototype.addAxes = function() {
 Histogram.prototype.addBar = function() {
 	// copy scope
 	var _this = this;
-	// set the parameters for the histogram
+
+	// shorthand for margin
+	var m = _this.margin;
+
   	var histogram = d3.layout.histogram()
   					  .bins(_this.xScale.ticks(10))
   					  (_this.data);
-
-
   	var bar = _this.plot.selectAll(".bar-hist_")
   	          .data(_this.group_by)
   	          .enter().append("g")
@@ -593,18 +617,18 @@ Histogram.prototype.addBar = function() {
   	bar.append("rect")
     .attr("width", 10)
     .attr("fill", _this.color)
-    .attr("height", function(d) { return _this.height - (_this.margin.top + _this.margin.bottom) - _this.yScale(d.values); })
+    .attr("height", function(d) { return _this.height - (m.top + m.bottom) - _this.yScale(d.values); })
 };
 
 // Bar chart
 var Bar = function(options) {
+	// copy scope
+	var _this = this;
+
 	// mandatory
 	this.data = options.data;
 	this.x = options.x;
 	this.y = options.y;
-
-	// copy scope
-	var _this = this;
 
 	// optional
 	if(!("height" in options)) {
@@ -676,10 +700,12 @@ Bar.prototype.draw = function() {
 }
 
 Bar.prototype.initialize = function() {
-	console.log("Initializing...");
 	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
+
 	// set up SVG
 	d3.select(_this.element).html("");
 
@@ -694,33 +720,35 @@ Bar.prototype.initialize = function() {
 
 	// append <g>
 	_this.plot = svg.append("g")
-		.attr("transform", "translate(" + _this.margin.left + "," + _this.margin.top + ")");
+		.attr("transform", "translate(" + m.left + "," + m.top + ")");
 }
 
 Bar.prototype.createScales = function() {
-	// margin
+	// copy scope
 	var _this = this;
+
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y extent
 	var xExtent = _this.x
-
 	var yExtent = [_this.yMin,
 				   _this.yMax];
 
+	// x and y scale
 	this.xScale = d3.scale.ordinal()
         .rangePoints([0, _this.width-m.right-m.left])
         .domain(_this.xDomain);
-
     this.yScale = d3.scale.linear()
         .range([_this.height-(m.top+m.bottom), 0])
         .domain(yExtent);
 }
 
 Bar.prototype.addAxes = function() {
-	console.log("adding axes...");
+	// copy scope
 	var _this = this;
-	// margin
+
+	// shorthand for margin
 	var m = _this.margin;
 
 	// x and y axis
@@ -733,7 +761,7 @@ Bar.prototype.addAxes = function() {
         .orient("left")
         .ticks(2);
 
-    // add the axis
+    // x-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "x axis")
@@ -744,11 +772,12 @@ Bar.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "x label")
     .attr("text-anchor", "middle")
-    .attr("x", (this.width - (this.margin.left + this.margin.right))/2)
-    .attr("y", this.height - this.margin.bottom)
+    .attr("x", (this.width - (m.left + m.right))/2)
+    .attr("y", this.height - m.bottom)
     .attr("font-size", "0.75em")
     .text(_this.xLabel);
 
+    // y-axis
     this.plot.append("g")
     	.style("font-size", "0.5em")
         .attr("class", "y axis")
@@ -758,8 +787,8 @@ Bar.prototype.addAxes = function() {
     this.plot.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", -1 * this.margin.left/2)
-    .attr("x", -1 * (this.height - (this.margin.top + this.margin.bottom))/2)
+    .attr("y", -1 * m.left/2)
+    .attr("x", -1 * (this.height - (m.top + m.bottom))/2)
     .attr("font-size", "0.75em")
     .attr("transform", "rotate(-90)")
     .text(_this.yLabel);
@@ -774,6 +803,9 @@ Bar.prototype.addBar = function() {
 	// copy scope
 	var _this = this;
 
+	// shorthand for margin
+	var m = _this.margin;
+
   	var bar = _this.plot.selectAll(".bar-chart_")
   	          .data(_this.data)
   	          .enter().append("g")
@@ -784,5 +816,5 @@ Bar.prototype.addBar = function() {
     .attr("width", 10)
     .attr("fill", _this.color)
     .attr("y", function(d) { return _this.yScale(d[_this.y]); })
-    .attr("height", function(d) { return _this.height - (_this.margin.top + _this.margin.bottom) - _this.yScale(d[_this.y]); })
+    .attr("height", function(d) { return _this.height - (m.top + m.bottom) - _this.yScale(d[_this.y]); })
 }
