@@ -1,5 +1,5 @@
 # d3-charts
-A library for making simple d3 charts and graphs.
+A library for making simple d3 charts and graphs. Currently, for d3 Version 3.
 
 ## Graph and chart support
 
